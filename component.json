@@ -1,0 +1,15 @@
+{
+  "name": "angular-translate-interpolation-formatjs",
+  "repo": "vincentlaucy/angular-translate-interpolation-formatjs",
+  "description": "plugin to use formatjs at angular-translate",
+  "version": "0.0.1",
+  "keywords": [
+    "angular"
+  ],
+  "scripts": [
+    "angular-translate-interpolation-formatjs.js"
+  ],
+  "styles": [
+  ]
+}
+
