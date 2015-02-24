@@ -1,17 +1,12 @@
-/*!
- * angular-translate - v2.5.0 - 2014-12-07
- * http://github.com/angular-translate/angular-translate
- * Copyright (c) 2014 ; Licensed MIT
- */
 angular.module('pascalprecht.translate').constant(
     'TRANSLATE_FS_INTERPOLATION_CACHE', '$translateFormatJsInterpolation')
   .factory('$translateFormatJsInterpolation', [
     '$cacheFactory',
     'TRANSLATE_FS_INTERPOLATION_CACHE',
-    function($cacheFactory, TRANSLATE_MF_INTERPOLATION_CACHE) {
+    function($cacheFactory, TRANSLATE_FS_INTERPOLATION_CACHE) {
       var DEFAULT_LOCALE = 'en';
       var $translateInterpolator = {},
-        $cache = $cacheFactory.get('TRANSLATE_FS_INTERPOLATION_CACHE'),
+        $cache = $cacheFactory.get(TRANSLATE_FS_INTERPOLATION_CACHE),
         _locale = DEFAULT_LOCALE;
       //
       $identifier = 'formatjs',
@@ -39,11 +34,19 @@ angular.module('pascalprecht.translate').constant(
         return result;
       };
       if (!$cache) {
-        $cache = $cacheFactory('TRANSLATE_FS_INTERPOLATION_CACHE');
+        $cache = $cacheFactory(TRANSLATE_FS_INTERPOLATION_CACHE);
       }
       $translateInterpolator.setLocale = function(locale) {
-        //TODO
-        _locale = locale.split("_")[0];
+        var langId;
+        if (locale.split("_").length == 2) {
+          langId = locale.split("_")[0];
+        } else if (locale.split("-").length == 2) {
+          langId = locale.split("-")[0];
+        } else {
+          langId = locale;
+        }
+
+        _locale = langId;
       };
       $translateInterpolator.getInterpolationIdentifier = function() {
         return $identifier;
@@ -52,7 +55,8 @@ angular.module('pascalprecht.translate').constant(
         $sanitizeValueStrategy = value;
         return this;
       };
-      $translateInterpolator.interpolate = function(string, interpolateParams) {
+      $translateInterpolator.interpolate = function(string,
+        interpolateParams) {
 
         interpolateParams = interpolateParams || {};
         if ($sanitizeValueStrategy) {

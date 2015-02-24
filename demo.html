@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html ng-app='app'>
+
+<head>
+  <meta charset="utf-8">
+  <title translate="TITLE">Basic usage, comparison with messageformat.js vs formatjs</title>
+  <style>body { text-align: center; }</style>
+  <link href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.9.0/semantic.min.css" media="all" rel="stylesheet">
+</head>
+
+<body ng-controller="ctrl">
+
+  <!-- An example of changing language in runtime -->
+  <p>
+    <a href="#" ng-click="setLang('en_US')">English</a>
+    |
+    <a href="#" ng-click="setLang('ru_RU')">Русский</a>
+  </p>
+
+  <div class="ui grid">
+    <div class="centered row">
+      <div class="two wide column"><h1>Format</h1></div>
+      <div class="four wide column"><h1>string</h1></div>
+      <div class="four wide column"><h1>By formatjs</h1></div>
+      <div class="four wide column"><h1>By messageformat</h1></div>
+    </div>
+    <div class="centered row">
+      <div class="two wide column">Testing gender</div>
+      <div class="four wide column">{{'GENDER_TEST'|translate:{}:""}}</div>
+      <div class="four wide column">{{ 'GENDER_TEST' | translate:"{ GENDER: 'male' }":"formatjs" }}</div>
+      <div class="four wide column">{{ 'GENDER_TEST' | translate:"{ GENDER: 'male' }":"messageformat" }}</div>
+    </div>
+    <div class="centered row">
+      <div class="two wide column">Testing number w/o explicit format</div>
+      <div class="four wide column">{{'NUMBER_TEST'|translate:{}:""}}</div>
+      <div class="four wide column">{{ 'NUMBER_TEST' | translate:"{ amount: 1234567.89 }":"formatjs" }}</div>
+      <div class="four wide column">{{ 'NUMBER_TEST' | translate:"{ amount: 1234567.89 }":"messageformat" }}</div>
+    </div>
+    <div class="centered row">
+      <div class="two wide column">Testing number w/ explicit format</div>
+      <div class="four wide column">{{'NUMBER_FORMAT_TEST'|translate:{}:""}}</div>
+      <div class="four wide column">{{ 'NUMBER_FORMAT_TEST' | translate:"{ amount: 1234567.89 }":"formatjs" }}</div>
+      <div class="four wide column">/</div>
+    </div>
+    <div class="centered row">
+      <div class="two wide column"> expression works </div>
+      <div class="four wide column">amount: 1234567.89-123</div>
+      <div class="four wide column">{{ 'NUMBER_TEST' | translate:"{ amount: 1234567.89-123 }":"formatjs" }}</div>
+      <div class="four wide column">{{ 'NUMBER_TEST' | translate:"{ amount: 1234567.89-123}":"messageformat" }}</div>
+    </div>
+    <div class="centered row">
+      <div class="two wide column">we intentionally giving up filters (parsing errors)</div>
+      <div class="four wide column">{{'NUMBER_FILTER_TEST'|translate:{amount:123}:"pseudo"}}</div>
+      <div class="four wide column">{{ 'NUMBER_FILTER_TEST' | translate:"{ amount: 1234567.89  }":"formatjs" }}</div>
+      <div class="four wide column">{{ 'NUMBER_FILTER_TEST' | translate:"{ amount: 1234567.89}":"messageformat" }}</div>
+    </div>
+  </div>
+<br/>
+  <!-- Translation by a filter -->
+  <!-- Translation by a directive -->
+  <p translate="GENDER_TEST" translate-values="{ GENDER: 'other' }" translate-interpolation="messageformat"></p>
+
+  <!-- Using inner HTML as a key for translation -->
+  <p translate>HTML_KEYS</p>
+
+  <hr>
+
+  <!-- Passing a data object to the translation by the filter -->
+  <p>{{'DATA_TO_FILTER' | translate: tlData}}</p>
+
+  <!-- Passing a data object to the translation by the directive -->
+  <p translate="DATA_TO_DIRECTIVE" translate-values="{{tlData}}"></p>
+
+  <hr>
+
+  <!-- Passing a raw data to the filter -->
+  <p>{{'RAW_TO_FILTER' | translate:'{ type: "raw" }' }}</p>
+
+  <!-- Passing a raw data to the filter -->
+  <p translate="RAW_TO_DIRECTIVE" translate-values="{ type: 'directives' }"></p>
+
+  <hr>
+
+  <!-- Using a $translate service -->
+  <p>{{jsTrSimple}}</p>
+
+  <!-- Passing a data to the $translate service -->
+  <p>{{jsTrParams}}</p>
+
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/messageformat/messageformat.js"></script>
+<script src="bower_components/messageformat/locale/ru.js"></script>
+<script src="bower_components/angular-translate/angular-translate.js"></script>
+<script src="bower_components/angular-translate-interpolation-messageformat/angular-translate-interpolation-messageformat.js"></script>
+<script src="vendor/intl-messageformat-with-locales.min.js"></script>
+<script src="./angular-translate-interpolation-formatjs.js"></script>
+<script src="./angular-translate-interpolation-pseudo.js"></script>
+
+<script>
+angular.module('app', ['pascalprecht.translate'])
+
+.config(['$translateProvider', function($translateProvider){
+
+  // Adding a translation table for the English language
+  $translateProvider.translations('en_US', {
+    "TITLE"     : "How to use",
+    "HEADER"    : "You can translate texts by using a filter.",
+    "GENDER_TEST": '{GENDER, select, male{He} female{She} other{They}} liked this {GENDER} and \\{\\{ GENDER\\}\\}.',
+    "NUMBER_TEST" : "I have {amount} in my account",
+    "NUMBER_FORMAT_TEST" : "I have {amount,number} in my account",
+    "NUMBER_FILTER_TEST" : "I have {{amount| number:1}} in my account",
+    "HTML_KEYS" : "If you don't like an empty elements, you can write a key for the translation as an inner HTML of the directive.",
+    "DATA_TO_FILTER"    : "Your translations might also contain any static ({{staticValue}}) or random ({{randomValue}}) values, which are taken directly from the model.",
+    "DATA_TO_DIRECTIVE" : "And it's no matter if you use filter or directive: static is still {{staticValue}} and random is still {{randomValue}}.",
+    "RAW_TO_FILTER"     : "In case you want to pass a {{type}} data to the filter, you have only to pass it as a filter parameter.",
+    "RAW_TO_DIRECTIVE"  : "This trick also works for {{type}} with a small mods.",
+    "SERVICE"        : "Of course, you can translate your strings directly in the js code by using a $translate service.",
+    "SERVICE_PARAMS" : "And you are still able to pass params to the texts. Static = {{staticValue}}, random = {{randomValue}}."
+  });
+
+  // Adding a translation table for the Russian language
+  $translateProvider.translations('ru_RU', {
+    "TITLE"     : "Как пользоваться",
+    "HEADER"    : "Вы можете переводить тексты при помощи фильтра.",
+    "GENDER_TEST": '{GENDER, select, male{Er fand} female{Sie fand} other{Sie fanden}} es gut.',
+    "NUMBER_TEST" : "Ich habe {amount} in meinem Konto",
+    "NUMBER_FORMAT_TEST" : "Ich habe {amount,number} in meinem Konto",
+    "NUMBER_FILTER_TEST" : "Ich habe {{amount| number:1}} in meinem Konto",
+    "SUBHEADER" : "А если Вам не нравятся фильтры, Вы можете воспользоваться директивой.",
+    "HTML_KEYS" : "Если вам не нравятся пустые элементы, Вы можете записать ключ для перевода в как внутренний HTML директивы.",
+    "DATA_TO_FILTER"    : "Ваши переводы также могут содержать любые статичные ({{staticValue}}) или случайные ({{randomValue}}) значения, которые берутся прямо из модели.",
+    "DATA_TO_DIRECTIVE" : "И совершенно не важно используете ли Вы фильтр или директиву: статическое значение по прежнему {{staticValue}} и случайное - {{randomValue}}.",
+    "RAW_TO_FILTER"     : "Если вы хотите передать \"сырые\" ({{type}}) данные фильтру, Вам всего лишь нужно передать их фильтру в качестве параметров.",
+    "RAW_TO_DIRECTIVE"  : "Это также работает и для директив ({{type}}) с небольшими модификациями.",
+    "SERVICE"        : "Конечно, Вы можете переводить ваши строки прямо в js коде при помощи сервиса $translate.",
+    "SERVICE_PARAMS" : "И вы все еще можете передавать параметры в тексты. Статическое значение = {{staticValue}}, случайное = {{randomValue}}."
+  });
+
+  // Tell the module what language to use by default
+  $translateProvider.addInterpolation('$translatePesudoInterpolation');
+  $translateProvider.addInterpolation('$translateMessageFormatInterpolation');
+  $translateProvider.addInterpolation('$translateFormatJsInterpolation');
+  $translateProvider.preferredLanguage('en_US');
+
+}])
+
+.controller('ctrl', ['$scope', '$translate', function($scope, $translate) {
+
+  $scope.tlData = {
+    staticValue : 42,
+    randomValue : Math.floor(Math.random() * 1000)
+  };
+
+  $scope.jsTrSimple = $translate.instant('SERVICE');
+  $scope.jsTrParams = $translate.instant('SERVICE_PARAMS', $scope.tlData);
+
+  $scope.setLang = function(langKey) {
+    // You can change the language during runtime
+    $translate.use(langKey);
+
+    //Need manual reset
+    // setLocale
+
+
+    // A data generated by the script have to be regenerated
+    $scope.jsTrSimple = $translate.instant('SERVICE');
+    $scope.jsTrParams = $translate.instant('SERVICE_PARAMS', $scope.tlData);
+  };
+
+}]);
+
+
+</script>
+
+</body>
+</html>
