@@ -55,6 +55,10 @@ angular.module('pascalprecht.translate').constant(
         $sanitizeValueStrategy = value;
         return this;
       };
+
+      function _prefixMessageFormat(stringKey) {
+        return "mf." + stringKey;
+      }
       $translateInterpolator.interpolate = function(string,
         interpolateParams) {
 
@@ -64,11 +68,15 @@ angular.module('pascalprecht.translate').constant(
         }
         var stringKey = string + angular.toJson(interpolateParams);
         var interpolatedText = $cache.get(stringKey);
+
+
         if (!interpolatedText) {
-          var msg = new IntlMessageFormat(string, _locale);
-          $cache.put("mf." + stringKey, msg);
-          //TODO get from cache
-          interpolatedText = msg.format(interpolateParams);
+          var messageFormat = $cache.get(_prefixMessageFormat(stringKey));
+          if (!messageFormat) {
+            messageFormat = new IntlMessageFormat(string, _locale);
+            $cache.put(_prefixMessageFormat(stringKey), messageFormat);
+          }
+          interpolatedText = messageFormat.format(interpolateParams);
           $cache.put(stringKey, interpolatedText);
         }
         return interpolatedText;
