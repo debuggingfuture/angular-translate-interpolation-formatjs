@@ -1,0 +1,12 @@
+{
+  "name": "angular-translate-interpolation-formatjs",
+  "version": "0.0.0",
+  "description": "",
+ "dependencies": {
+   "angular-translate-interpolation-formatjs":"*"
+  },
+  "devDependencies": {
+    "webpack": "~1.7.3"
+  }
+}
+
