@@ -8,8 +8,7 @@ angular.module('pascalprecht.translate').constant(
       var $translateInterpolator = {},
         $cache = $cacheFactory.get(TRANSLATE_FS_INTERPOLATION_CACHE),
         _locale = DEFAULT_LOCALE;
-      //
-      $identifier = 'formatjs',
+      var $identifier = 'formatjs',
         $sanitizeValueStrategy = null,
         sanitizeValueStrategies = {
           escaped: function(params) {
